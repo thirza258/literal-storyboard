@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 
 interface GameTabProps {
-  onRoll: (newProgress: number) => void;
-}
+    onRoll: (newProgress: number) => void;
+    allies: number;
+    enemy: number;
+  }
 
-function GameTab({ onRoll }: GameTabProps) {
+function GameTab({ onRoll, allies, enemy }: GameTabProps) {
   const [progress, setProgress] = useState(0);
 
   const handleRoll = () => {
@@ -18,8 +20,8 @@ function GameTab({ onRoll }: GameTabProps) {
     <div className="p-4 rounded-md ml-40">
       <div className="text-white flex items-center justify-between">
         <div>
-        <p className="font-bold">Allies Progress:</p>
-        <p className="font-bold">Enemy Progress:</p>
+        <p className="font-bold">Allies Progress: {allies} </p>
+        <p className="font-bold">Enemy Progress: {enemy}</p>
         </div>
         
         <div className="flex items-center space-x-4">

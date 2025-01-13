@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
 import MatrixBoard from "./components/MatrixBoard";
@@ -9,12 +9,17 @@ import Novel from "./components/Novel";
 import GameTab from "./components/GameTab";
 import Login from "./components/Login";
 import About from "./components/About";
+import { run } from "./ai_handler/sentiment";
 
 interface Board {
   name: string;
   assign: number;
   X_location: number;
   Y_location: number;
+}
+
+interface SentimentResponse {
+  sentiment: boolean;
 }
 
 function App() {
@@ -24,16 +29,59 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [storyNow, setStoryNow] = useState(false);
   const [username, setUsername] = useState('');
+  const [sentiment, setSentiment] = useState<SentimentResponse | null>(null);
+  const [allies, setAllies] = useState(0);
+  const [enemies, setEnemies] = useState(0);
+
+ console.log(sentiment);
+ console.log(storyNow);
 
   const navigate = useNavigate();
 
   const handleProgressUpdate = (newProgress: number) => {
     setIndex((prevIndex) => prevIndex + newProgress);
     setStoryNow(true);
-    if(storyNow === true){
-      navigate('/novel');
-    }
+    navigate('/novel');
   };
+
+  const validateSentimentResponse = (data: any): data is SentimentResponse => {
+    return (
+      data &&
+      typeof data.sentiment === 'boolean'
+    );
+  };
+
+  const handleAnswer = async (answer: string) => {
+    setStoryNow(false);
+    const response = await run({ input: answer });
+    const responseText = await response.response.text();
+    console.log(responseText);
+    let parsedData : any;
+    try {
+      parsedData =  JSON.parse(responseText);
+    }catch (parseError) {
+      throw new Error('Failed to parse JSON response');
+    }
+
+    if (!validateSentimentResponse(parsedData)) {
+      throw new Error('Invalid story data structure');
+    }
+
+
+
+    setSentiment(parsedData);
+
+    if(parsedData.sentiment){
+      setAllies((prevAllies) => prevAllies + 1);
+    }
+    else{
+      setEnemies((prevEnemies) => prevEnemies + 1);
+    }
+
+    navigate('/');
+  }
+
+
 
   useEffect(() => {
 
@@ -101,7 +149,7 @@ function App() {
 
   return (
     <div className="bg-[#3000BE]">
-    <Router>
+  
       <NavBar username={username} />
       <div className="flex mt-10">
         <Sidebar />
@@ -114,18 +162,17 @@ function App() {
                   <MatrixBoard boards={boards} />
                   <Character boards={boards} index={index} />
                   <div className="mt-4">
-                    <GameTab onRoll={handleProgressUpdate} />
+                    <GameTab onRoll={handleProgressUpdate} allies={allies} enemy={enemies}/>
                   </div>
                 </div>
               }
             />
-            <Route path="/novel" element={<Novel />} />
+            <Route path="/novel" element={<Novel setStoryNow={setStoryNow} onAnswer={handleAnswer}/> } />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login setUsername={setUsername} />} />
           </Routes>
         </div>
       </div>
-    </Router>
     </div>
   );
 }

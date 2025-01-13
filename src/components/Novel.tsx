@@ -13,7 +13,12 @@ interface StoryData {
   listOfAnswer: string[];
 }
 
-const Novel: React.FC = () => {
+interface NovelProps {
+    setStoryNow: React.Dispatch<React.SetStateAction<boolean>>;
+    onAnswer: (answer: string) => Promise<void>;
+  }
+
+  const Novel: React.FC<NovelProps> = ({  setStoryNow, onAnswer }) => {
   const [storyData, setStoryData] = useState<StoryData | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,8 +56,9 @@ const Novel: React.FC = () => {
 
   const handleAnswerClick = (answer: string) => {
     console.log(`Answer chosen: ${answer}`);
+    setStoryNow(false);
+    onAnswer(answer);
     navigate('/')
-    
   };
 
   const preloadImages = () => {
