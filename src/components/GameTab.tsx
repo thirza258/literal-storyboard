@@ -16,7 +16,7 @@ function GameTab({ onRoll }: GameTabProps) {
 
   return (
     <div className="p-4 rounded-md ml-40">
-      <div className="flex items-center justify-between">
+      <div className="text-white flex items-center justify-between">
         <div>
         <p className="font-bold">Allies Progress:</p>
         <p className="font-bold">Enemy Progress:</p>

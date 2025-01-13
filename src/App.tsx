@@ -1,7 +1,6 @@
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-import React, { useState, useEffect, useRef } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { useState, useEffect, useRef } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
 import MatrixBoard from "./components/MatrixBoard";
@@ -10,8 +9,6 @@ import Novel from "./components/Novel";
 import GameTab from "./components/GameTab";
 import Login from "./components/Login";
 import About from "./components/About";
-
-const client = generateClient<Schema>();
 
 interface Board {
   name: string;
@@ -28,9 +25,14 @@ function App() {
   const [storyNow, setStoryNow] = useState(false);
   const [username, setUsername] = useState('');
 
+  const navigate = useNavigate();
+
   const handleProgressUpdate = (newProgress: number) => {
     setIndex((prevIndex) => prevIndex + newProgress);
     setStoryNow(true);
+    if(storyNow === true){
+      navigate('/novel');
+    }
   };
 
   useEffect(() => {
@@ -95,7 +97,10 @@ function App() {
 
   console.log(boards)
 
+  const isLoggedIn = username.trim() !== '';
+
   return (
+    <div className="bg-[#3000BE]">
     <Router>
       <NavBar username={username} />
       <div className="flex mt-10">
@@ -121,6 +126,7 @@ function App() {
         </div>
       </div>
     </Router>
+    </div>
   );
 }
 
