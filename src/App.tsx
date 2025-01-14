@@ -29,6 +29,7 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [storyNow, setStoryNow] = useState(false);
   const [username, setUsername] = useState("");
+
   const [sentiment, setSentiment] = useState<SentimentResponse | null>(null);
   const [allies, setAllies] = useState(0);
   const [enemies, setEnemies] = useState(0);
@@ -230,7 +231,7 @@ function App() {
   }
 
   return (
-    <div className="bg-[#3000BE]">
+    <div>
       <NavBar username={username} />
       <div className="flex mt-10">
         <Sidebar />

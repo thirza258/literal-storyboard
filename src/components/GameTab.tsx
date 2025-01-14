@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface GameTabProps {
-    readonly onRoll: (newProgress: number) => void;
-    readonly allies: number;
-    readonly enemy: number;
-  }
+  readonly onRoll: (newProgress: number) => void;
+  readonly allies: number;
+  readonly enemy: number;
+}
 
 function GameTab({ onRoll, allies, enemy }: GameTabProps) {
   const [progress, setProgress] = useState(0);
@@ -20,11 +20,14 @@ function GameTab({ onRoll, allies, enemy }: GameTabProps) {
     <div className="p-4 rounded-md ml-40">
       <div className="text-white flex items-center justify-between">
         <div>
-        <p className="font-bold">Allies Progress: {allies} </p>
-        <p className="font-bold">Enemy Progress: {enemy}</p>
-        <p > Scores more than 3 than you enemy to Victorious</p>
+          <p className="font-bold">Allies Progress: {allies} </p>
+          <p className="font-bold">Enemy Progress: {enemy}</p>
+          <p className="bg-black text-white p-2 rounded">
+            Scores more than 3 than you enemy to Victorious, the AI will grade
+            your answer and calculate sentiment score.
+          </p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <button
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
@@ -43,9 +46,7 @@ function GameTab({ onRoll, allies, enemy }: GameTabProps) {
           </button>
         </div>
       </div>
-      <div className="mt-4">
-        {/* Additional content can go here */}
-      </div>
+      <div className="mt-4">{/* Additional content can go here */}</div>
     </div>
   );
 }
