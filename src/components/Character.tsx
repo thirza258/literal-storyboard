@@ -1,4 +1,5 @@
 import React from 'react';
+import character from '../assets/character.png';
 
 interface Board {
   name: string;
@@ -13,11 +14,11 @@ interface CharacterProps {
 }
 
 const Character: React.FC<CharacterProps> = ({ boards, index }) => {
-    if (boards.length === 0) {
-        return null; // Return nothing if there are no boards
-      }
-    
-      const randomBoard = boards[index % boards.length];
+  if (boards.length === 0) {
+    return null; // Return nothing if there are no boards
+  }
+
+  const randomBoard = boards[index % boards.length];
 
   return (
     <div
@@ -26,9 +27,11 @@ const Character: React.FC<CharacterProps> = ({ boards, index }) => {
         position: 'absolute',
         left: randomBoard.X_location + 10,
         top: randomBoard.Y_location + 10,
-        width: '30px',
-        height: '30px',
-        backgroundColor: 'red',
+        width: '50px',
+        height: '50px',
+        backgroundImage: `url(${character})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         borderRadius: '50%',
       }}
     />

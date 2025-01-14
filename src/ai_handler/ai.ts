@@ -3,7 +3,6 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 export async function run({ input }: { input: string }) {
   try {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    console.log(apiKey);
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const model = genAI.getGenerativeModel({
@@ -91,7 +90,6 @@ export async function run({ input }: { input: string }) {
     console.log(result.response.text());
     return result;
   } catch (error) {
-    console.error("API KEY:", import.meta.env.VITE_GEMINI_API_KEY);
     console.error("Error initializing GoogleGenerativeAI:", error);
     throw error;
   }

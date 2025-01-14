@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import NavBar from "./components/NavBar";
@@ -10,6 +9,7 @@ import GameTab from "./components/GameTab";
 import Login from "./components/Login";
 import About from "./components/About";
 import { run } from "./ai_handler/sentiment";
+import WinPage from "./components/Winner";
 
 interface Board {
   name: string;
@@ -25,66 +25,142 @@ interface SentimentResponse {
 function App() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [index, setIndex] = useState(0);
-  const [boardSize] = useState(5);
+  const [boardSize, setBoardSize] = useState(8);
   const containerRef = useRef<HTMLDivElement>(null);
   const [storyNow, setStoryNow] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [sentiment, setSentiment] = useState<SentimentResponse | null>(null);
   const [allies, setAllies] = useState(0);
   const [enemies, setEnemies] = useState(0);
 
- console.log(sentiment);
- console.log(storyNow);
+  console.log(sentiment);
+  console.log(storyNow);
 
   const navigate = useNavigate();
 
   const handleProgressUpdate = (newProgress: number) => {
-    setIndex((prevIndex) => prevIndex + newProgress);
-    setStoryNow(true);
-    navigate('/novel');
+    setIndex((prevIndex) => {
+      const newIndex = prevIndex + newProgress;
+      return newIndex >= boardSize ? newIndex - boardSize : newIndex;
+    });
+    setTimeout(() => {
+      setStoryNow(true);
+      navigate("/novel");
+    }, 2000);
+
+    if(allies >= 3 + enemies) {
+      navigate("/winner");
+    }
   };
 
   const validateSentimentResponse = (data: any): data is SentimentResponse => {
-    return (
-      data &&
-      typeof data.sentiment === 'boolean'
-    );
+    return data && typeof data.sentiment === "boolean";
   };
 
   const handleAnswer = async (answer: string) => {
     setStoryNow(false);
     const response = await run({ input: answer });
-    const responseText = await response.response.text();
+    const responseText = response.response.text();
     console.log(responseText);
-    let parsedData : any;
+    let parsedData: any;
     try {
-      parsedData =  JSON.parse(responseText);
-    }catch (parseError) {
-      throw new Error('Failed to parse JSON response');
+      parsedData = JSON.parse(responseText);
+    } catch (parseError) {
+      throw new Error("Failed to parse JSON response");
     }
 
     if (!validateSentimentResponse(parsedData)) {
-      throw new Error('Invalid story data structure');
+      throw new Error("Invalid story data structure");
     }
-
-
 
     setSentiment(parsedData);
 
-    if(parsedData.sentiment){
+    if (parsedData.sentiment) {
       setAllies((prevAllies) => prevAllies + 1);
-    }
-    else{
+    } else {
       setEnemies((prevEnemies) => prevEnemies + 1);
     }
 
-    navigate('/');
-  }
+    navigate("/");
+  };
 
-
+  const listOfCities: string[] = [
+    "Emberfall",
+    "Silverhaven",
+    "Stonebridge",
+    "Whisperwind",
+    "Ironhold",
+    "Sunstone",
+    "Moonwhisper",
+    "Riverbend",
+    "Oakhaven",
+    "Shadowfen",
+    "Frostpeak",
+    "Gildedreach",
+    "Stormwatch",
+    "Veridian",
+    "Crimsonhold",
+    "Azureport",
+    "Mistywood",
+    "Coralcoast",
+    "Obsidian",
+    "Dragon's Tooth",
+    "Ebonreach",
+    "Starfall",
+    "Sunkenkeep",
+    "Wyvern's Rest",
+    "Silent Hollow",
+    "Thornwood",
+    "Jade Citadel",
+    "Ambergate",
+    "Garnet Hold",
+    "Quartz Ridge",
+    "Beryl Shores",
+    "Citrine Bay",
+    "Diamond Vale",
+    "Ruby Glen",
+    "Sapphire Spire",
+    "Emerald Crest",
+    "Tanzanite Towers",
+    "Peridot Path",
+    "Aquamarine Altar",
+    "Lapis Lagoon",
+    "Amethyst Ascent",
+    "Topaz Terrace",
+    "Opal Oasis",
+    "Spinel Summit",
+    "Tourmaline Trail",
+    "Agate Arch",
+    "Malachite Meadow",
+    "Serpentine Steps",
+    "Jasper Junction",
+    "Flint Fields",
+    "Granite Glade",
+    "Slate Slopes",
+    "Marble Mound",
+    "Chalk Cliffs",
+    "Basalt Bastion",
+    "Pumice Peak",
+    "Sandstone Sanctuary",
+    "Clay Commons",
+     "Quicksilver Quarry",
+    "Adamant Anvil",
+    "Mithril Mines",
+    "Aurum Alleys",
+    "Electrum Emporium",
+     "Bronze Bridge",
+    "Copper Cove"
+  ];
 
   useEffect(() => {
-
+    const shuffleArray = (array: string[]) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    };
+  
     const generateNonOverlappingPosition = (
       existingBoards: Board[],
       containerWidth: number,
@@ -95,9 +171,9 @@ function App() {
       do {
         position = {
           X_location:
-            0.2 * containerWidth + Math.random() * (containerWidth * 0.6), // 20% to 80% of width
+            0.2 * containerWidth + Math.random() * (containerWidth * 0.6),
           Y_location:
-            0.1 * containerHeight + Math.random() * (containerHeight * 0.7), // 10% to 80% of height
+            0.1 * containerHeight + Math.random() * (containerHeight * 0.7),
         };
         overlap = existingBoards.some(
           (board) =>
@@ -107,49 +183,54 @@ function App() {
       } while (overlap);
       return position;
     };
-
+  
     const generateRandomBoards = () => {
       if (!containerRef.current) {
-        console.warn('Container ref is not available.');
+        console.warn("Container ref is not available.");
         return;
       }
       const containerWidth = containerRef.current.offsetWidth;
-      const containerHeight = containerRef.current.offsetHeight * 0.7; // 70% of container's height
-      console.log(containerWidth, containerHeight);
-
+      const containerHeight = containerRef.current.offsetHeight * 0.7;
+  
+      const shuffledCities = shuffleArray([...listOfCities]); // Shuffle city names
       const boards: Board[] = [];
-      for (let i = 0; i < boardSize * boardSize; i++) {
+      for (let i = 0; i < boardSize; i++) {
+        if (i >= shuffledCities.length) {
+          console.warn("Not enough unique cities to assign unique names to each board");
+          break;
+        }
         const position = generateNonOverlappingPosition(
           boards,
           containerWidth,
           containerHeight
         );
         boards.push({
-          name: `Board ${i + 1}`,
+          name: shuffledCities[i], // Assign city name from shuffled list
           assign: i + 1,
           ...position,
         });
       }
       setBoards(boards);
     };
-
+  
     generateRandomBoards();
-
+  
     const handleResize = () => {
-      generateRandomBoards(); 
+      generateRandomBoards();
     };
-
+  
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize); // Clean up event listener
+    return () => window.removeEventListener("resize", handleResize);
   }, [boardSize]);
 
-  console.log(boards)
+  console.log(boards);
 
-  const isLoggedIn = username.trim() !== '';
+  if (username.trim() === '' ) {
+    return <Login setUsername={setUsername} setBoardSize={setBoardSize} />;
+  }
 
   return (
     <div className="bg-[#3000BE]">
-  
       <NavBar username={username} />
       <div className="flex mt-10">
         <Sidebar />
@@ -162,14 +243,24 @@ function App() {
                   <MatrixBoard boards={boards} />
                   <Character boards={boards} index={index} />
                   <div className="mt-4">
-                    <GameTab onRoll={handleProgressUpdate} allies={allies} enemy={enemies}/>
+                    <GameTab
+                      onRoll={handleProgressUpdate}
+                      allies={allies}
+                      enemy={enemies}
+                    />
                   </div>
                 </div>
               }
             />
-            <Route path="/novel" element={<Novel setStoryNow={setStoryNow} onAnswer={handleAnswer}/> } />
+            <Route
+              path="/novel"
+              element={
+                <Novel setStoryNow={setStoryNow} onAnswer={handleAnswer} />
+              }
+            />
             <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login setUsername={setUsername} />} />
+            <Route path="/winner" element={<WinPage />} />
+            
           </Routes>
         </div>
       </div>

@@ -13,14 +13,14 @@ interface MatrixBoardProps {
 }
 
 const MatrixBoard: React.FC<MatrixBoardProps> = ({ boards }) => {
-
   return (
-    <div className=" w-full h-[70vh] relative"
-    style={{
-      backgroundImage: `url(${fantasyMap})`,
-      backgroundSize: 'cover',  // Ensures the background image covers the container
-      backgroundPosition: 'center',  // Centers the background image
-    }}
+    <div
+      className="w-full h-[70vh] relative"
+      style={{
+        backgroundImage: `url(${fantasyMap})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
       {boards.map((board) => (
         <div
@@ -31,12 +31,19 @@ const MatrixBoard: React.FC<MatrixBoardProps> = ({ boards }) => {
             top: board.Y_location,
             width: '50px',
             height: '50px',
-            border: '2px solid gray',
-            borderRadius: '8px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
           }}
           className="flex items-center justify-center"
         >
-          {board.name}
+          <span
+            className="text-white text-sm font-bold px-2 py-1 rounded"
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent background
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)', // Stronger text shadow
+            }}
+          >
+            {board.name}
+          </span>
         </div>
       ))}
     </div>

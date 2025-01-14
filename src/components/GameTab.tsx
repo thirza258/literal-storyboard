@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 interface GameTabProps {
-    onRoll: (newProgress: number) => void;
-    allies: number;
-    enemy: number;
+    readonly onRoll: (newProgress: number) => void;
+    readonly allies: number;
+    readonly enemy: number;
   }
 
 function GameTab({ onRoll, allies, enemy }: GameTabProps) {
@@ -22,6 +22,7 @@ function GameTab({ onRoll, allies, enemy }: GameTabProps) {
         <div>
         <p className="font-bold">Allies Progress: {allies} </p>
         <p className="font-bold">Enemy Progress: {enemy}</p>
+        <p > Scores more than 3 than you enemy to Victorious</p>
         </div>
         
         <div className="flex items-center space-x-4">
