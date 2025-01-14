@@ -2,6 +2,7 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 export async function run({ input }: { input: string }) {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  console.log(apiKey);
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const model = genAI.getGenerativeModel({
