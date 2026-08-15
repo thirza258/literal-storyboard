@@ -3,8 +3,7 @@ import fantasyMap from '../assets/map.svg';
 
 const About: React.FC = () => {
   return (
-    <div className="min-h-screen bg-fixed bg-cover bg-no-repeat text-white py-16"
-         style={{ backgroundImage: 'url(/path-to-your-fantasy-background.jpg)' }}>
+    <div className="min-h-screen text-white py-16 ls-fade-in">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-yellow-500"
@@ -12,7 +11,7 @@ const About: React.FC = () => {
             Literal Storyboard
           </h1>
 
-          <div className="bg-opacity-80 bg-gray-800 rounded-lg shadow-2xl p-8 mb-8 border-4 border-yellow-700">
+          <div className="bg-gray-800/80 rounded-lg shadow-2xl p-8 mb-8 border-4 border-yellow-700">
             <h2 className="text-4xl font-semibold mb-4 text-yellow-400" style={{ fontFamily: 'Cinzel, serif' }}>
               About Our Project
             </h2>
@@ -25,10 +24,10 @@ const About: React.FC = () => {
                 Key Features
               </h3>
               <ul className="list-disc list-inside text-gray-300 space-y-2 pl-4">
-                <li><span className="mr-2">🗡️</span>AI-Powered Story Generation using Amazon Q</li>
+                <li><span className="mr-2">🗡️</span>AI-Powered Story Generation via OpenRouter</li>
                 <li><span className="mr-2">🗺️</span>Dynamic Fantasy Map Integration</li>
                 <li><span className="mr-2">🏰</span>Interactive World Building Tools</li>
-                <li><span className="mr-2">📜</span>Procedural Content Generation</li>
+                <li><span className="mr-2">📜</span>Scene Backgrounds Generated per Story Beat</li>
                 <li><span className="mr-2">⚔️</span>Real-time Collaboration Capabilities</li>
               </ul>
             </div>
@@ -38,7 +37,7 @@ const About: React.FC = () => {
                 Technology Stack
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {['React', 'TypeScript', 'Tailwind CSS', 'Amazon Q', 'AWS Services', 'Fantasy Map Generator', 'Gemini AI', 'Imagen3'].map((tech) => (
+                {['React', 'TypeScript', 'Tailwind CSS', 'Amazon Q', 'AWS Services', 'Fantasy Map Generator', 'OpenRouter', 'Gemini 3 Flash', 'Nano Banana 2'].map((tech) => (
                   <div key={tech} className="bg-gray-700 rounded-lg p-3 text-center border-2 border-yellow-500">
                     {tech}
                   </div>
@@ -54,7 +53,7 @@ const About: React.FC = () => {
                 <p className="text-gray-300 mb-4">
                   Our project integrates with the Fantasy Map Generator to create rich, detailed worlds for your gaming adventures. Each map is uniquely generated and can be customized to fit your story's needs.
                 </p>
-                <div className="aspect-w-16 aspect-h-9">
+                <div className="aspect-video">
                   <img
                     src={fantasyMap}
                     alt="Fantasy Map Example"
@@ -73,8 +72,8 @@ const About: React.FC = () => {
               </p>
               <p className="text-gray-300">
                 Special Thanks to AWS Amplify for providing the platform to host our project. 
-                Thanks to Gemini AI for providing the AI capabilities to our project. 
-                Thanks to Imagen3 for providing the image and character. 
+                Thanks to OpenRouter for routing every story and scene request to the model of our choice. 
+                Thanks to Nano Banana for painting the scenes and characters. 
                 Thanks to Fantasy Map Generator for providing the map generation capabilities. 
                 Thanks to Amazon Q and Copilot for assist on development of the project.
               </p>

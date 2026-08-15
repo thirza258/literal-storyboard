@@ -1,270 +1,220 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import imageHarbour from "../assets/image_harbour.png";
 import imageHome from "../assets/image_home.png";
 import imageCityStreet from "../assets/image_city_street.png";
 import imageHall from "../assets/image_hall.png";
 import imageDining from "../assets/image_dining.png";
-import { run } from "../ai_handler/ai";
-import { useNavigate } from "react-router-dom";
-
-interface StoryData {
-  story: string;
-  question: string;
-  listOfAnswer: string[];
-}
+import { generateStory, type StoryData } from "../ai_handler/ai";
+import { generateSceneImage } from "../ai_handler/image";
 
 interface NovelProps {
-  setStoryNow: React.Dispatch<React.SetStateAction<boolean>>;
+  city: string;
+  /** Chosen when the party arrives, so it stays stable across re-renders. */
+  npc: string;
   onAnswer: (answer: string) => Promise<void>;
 }
 
-const Novel: React.FC<NovelProps> = ({ setStoryNow, onAnswer }) => {
-  const [storyData, setStoryData] = useState<StoryData | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentLine, setCurrentLine] = useState(0);
-  const [step, setStep] = useState<"story" | "question" | "answer">("story");
-  const [currentImage, setCurrentImage] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [storyLines, setStoryLines] = useState<string[]>([]);
+/** Bundled art, used until (or instead of) a generated scene. */
+const FALLBACK_ART = [
+  imageHarbour,
+  imageHome,
+  imageCityStreet,
+  imageHall,
+  imageDining,
+];
 
-  const navigate = useNavigate();
+const TYPE_MS = 18;
 
-  const listOfImages = [
-    imageHarbour,
-    imageHome,
-    imageCityStreet,
-    imageHall,
-    imageDining,
-  ];
+/** Stable per-city choice, so revisiting a place looks like the same place. */
+function fallbackArtFor(city: string) {
+  let hash = 0;
+  for (let i = 0; i < city.length; i++) hash = (hash * 31 + city.charCodeAt(i)) | 0;
+  return FALLBACK_ART[Math.abs(hash) % FALLBACK_ART.length];
+}
 
-  const handleInput = (event: KeyboardEvent | MouseEvent) => {
-    console.log("Current Step:", step);
-    if (step === "story") {
-      if (currentLine < storyLines.length - 1) {
-        setCurrentLine(currentLine + 1); // Advance story line
-        randomizeBackground(); // Update background image
-      } else {
-        setStep("question");
-      }
-    } else if (step === "question") {
-      setStep("answer");
-    } else if (step === "answer") {
-      setCurrentLine(0);
-    }
-  };
+const Novel: React.FC<NovelProps> = ({ city, npc, onAnswer }) => {
+  const bundledArt = useMemo(() => fallbackArtFor(city), [city]);
 
-  const randomizeBackground = () => {
-    const randomIndex = Math.floor(Math.random() * listOfImages.length);
-    setCurrentImage(randomIndex);
-  };
+  const [story, setStory] = useState<StoryData | null>(null);
+  const [generatedArt, setGeneratedArt] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"loading" | "story" | "question" | "grading">(
+    "loading"
+  );
+  const [lineIndex, setLineIndex] = useState(0);
+  const [visibleChars, setVisibleChars] = useState(0);
 
-  const handleAnswerClick = (answer: string) => {
-    console.log(`Answer chosen: ${answer}`);
-    setStoryNow(false);
-    onAnswer(answer);
-    navigate("/");
-  };
-
-  const preloadImages = () => {
-    listOfImages.forEach((src) => {
-      const img = new Image();
-
-      img.onload = () => {
-        setImagesLoaded((prev) => {
-          const newCount = prev + 1;
-          if (newCount === listOfImages.length) {
-            randomizeBackground();
-          }
-          return newCount;
-        });
-      };
-
-      img.onerror = () => {
-        setError("Failed to load some images");
-        setIsLoading(false);
-      };
-
-      img.src = src;
-    });
-  };
-
-  // Validate story data structure
-  const validateStoryData = (data: any): data is StoryData => {
-    return (
-      data &&
-      typeof data.story === "string" &&
-      typeof data.question === "string" &&
-      Array.isArray(data.listOfAnswer) &&
-      data.listOfAnswer.every((item: any) => typeof item === "string")
-    );
-  };
+  const mounted = useRef(true);
 
   useEffect(() => {
-    const fetchStoryData = async () => {
-      try {
-        const npcChar = [
-          "Villager",
-          "Knights",
-          "King",
-          "Queen",
-          "Merchant",
-          "Maids",
-          "Servant",
-          "Enemies",
-        ];
-
-        const getRandomNpcChar = () => {
-          const randomIndex = Math.floor(Math.random() * npcChar.length);
-          return npcChar[randomIndex];
-        };
-
-        const response = await run({
-          input: `Assume you are a ${getRandomNpcChar()}`,
-        });
-        const responseText = response.response.text();
-        let parsedData: any;
-
-        try {
-          parsedData = JSON.parse(responseText);
-        } catch (parseError) {
-          throw new Error("Failed to parse JSON response");
-        }
-
-        if (!validateStoryData(parsedData)) {
-          throw new Error("Invalid story data structure");
-        }
-
-        // Set the story data and split into lines
-        setStoryData(parsedData);
-
-        const lines = parsedData.story
-          .split("\n")
-          .filter((line: string) => line.trim());
-
-        if (lines.length === 0) {
-          throw new Error("Story content is empty");
-        }
-
-        setStoryLines(lines); // Update story lines
-
-        preloadImages();
-      } catch (err) {
-        console.error("Error fetching story:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch story data"
-        );
-        setIsLoading(false);
-      }
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
     };
-
-    fetchStoryData();
   }, []);
 
+  // Story first — the scene is readable the moment it arrives, and the
+  // generated background fades in behind it whenever it is ready.
   useEffect(() => {
-    if (storyData && imagesLoaded === listOfImages.length) {
-      window.addEventListener("keydown", handleInput);
-      window.addEventListener("click", handleInput);
-      setIsLoading(false);
+    const controller = new AbortController();
+
+    (async () => {
+      const data = await generateStory({ npc, city, signal: controller.signal });
+      if (controller.signal.aborted) return;
+
+      setStory(data);
+      setLineIndex(0);
+      setVisibleChars(0);
+      setPhase("story");
+
+      const url = await generateSceneImage(data.scene, controller.signal);
+      if (!url || controller.signal.aborted) return;
+
+      // Decode before swapping so the background never flashes half-painted.
+      const img = new Image();
+      img.onload = () => {
+        if (!controller.signal.aborted && mounted.current) setGeneratedArt(url);
+      };
+      img.src = url;
+    })().catch(() => {
+      /* generateStory and generateSceneImage already fall back on their own. */
+    });
+
+    return () => controller.abort();
+  }, [npc, city]);
+
+  const currentLine = story?.story[lineIndex] ?? "";
+  const isLineComplete = visibleChars >= currentLine.length;
+
+  // Typewriter reveal.
+  useEffect(() => {
+    if (phase !== "story" || isLineComplete) return;
+    const id = window.setInterval(() => {
+      setVisibleChars((prev) => Math.min(prev + 1, currentLine.length));
+    }, TYPE_MS);
+    return () => window.clearInterval(id);
+  }, [phase, isLineComplete, currentLine.length]);
+
+  /** One click/keypress finishes the line; the next one moves on. */
+  const advance = useCallback(() => {
+    if (phase !== "story" || !story) return;
+
+    if (!isLineComplete) {
+      setVisibleChars(currentLine.length);
+      return;
     }
-    console.log("step", step);
-    return () => {
-      window.removeEventListener("keydown", handleInput);
-      window.removeEventListener("click", handleInput);
+
+    if (lineIndex < story.story.length - 1) {
+      setLineIndex((prev) => prev + 1);
+      setVisibleChars(0);
+    } else {
+      setPhase("question");
+    }
+  }, [phase, story, isLineComplete, currentLine.length, lineIndex]);
+
+  // Keyboard only, and only while prose is on screen — the old build listened
+  // for clicks on `window` as well, which fired alongside the button's own
+  // handler and skipped two lines at a time. Scoping to the story phase also
+  // keeps Enter free for keyboard users choosing an answer.
+  useEffect(() => {
+    if (phase !== "story") return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (["Enter", " ", "ArrowRight"].includes(event.key)) {
+        event.preventDefault();
+        advance();
+      }
     };
-  }, [storyData, imagesLoaded]);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [phase, advance]);
 
-  if (isLoading) {
+  const handleAnswerClick = async (answer: string) => {
+    setPhase("grading");
+    await onAnswer(answer);
+  };
+
+  if (phase === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-        <div className="mb-4">Loading Novel...</div>
-        <div className="w-64 h-2 bg-gray-700 rounded-full">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-300"
-            style={{
-              width: `${
-                (storyData ? 50 : 0) + (imagesLoaded / listOfImages.length) * 50
-              }%`,
-            }}
-          />
+      <div className="flex flex-col items-center justify-center h-[80vh] text-white">
+        <div className="mb-4 text-lg">Riding into {city}…</div>
+        <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-full w-1/3 bg-yellow-400 animate-pulse rounded-full" />
         </div>
-        <div className="mt-2 text-sm text-gray-400">
-          {storyData ? "Loading images..." : "Loading story..."}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
-  if (!storyData || storyLines.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-        <div className="text-yellow-500">No story content available</div>
       </div>
     );
   }
 
   return (
-    <div
-      className="ml-40 h-[80vh] bg-cover bg-center transition-all duration-500"
-      style={{ backgroundImage: `url(${listOfImages[currentImage]})` }}
-    >
-      <div className="text-white p-4 bg-black bg-opacity-50">
-        {step === "story" ? (
-          <div>
-            <p>{storyLines[currentLine]}</p>
-            <button
-              className="mt-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-400 transition-colors"
-              onClick={() => {
-                if (currentLine < storyLines.length - 1) {
-                  setCurrentLine(currentLine + 1); // Advance story line
-                  randomizeBackground(); // Update background image
-                } else {
-                  setStep("question"); // Transition to question phase
-                }
-              }}
-            >
-              Next
-            </button>
+    <div className="relative h-[80vh] rounded-lg overflow-hidden border-2 border-yellow-700/60 ls-fade-in">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${bundledArt})` }}
+      />
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
+        style={{
+          backgroundImage: generatedArt ? `url(${generatedArt})` : undefined,
+          opacity: generatedArt ? 1 : 0,
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+      <div className="absolute top-3 left-4 flex items-center gap-2 text-xs uppercase tracking-widest text-yellow-300/90">
+        <span>
+          {city} · {npc}
+        </span>
+        {generatedArt && (
+          <span className="rounded bg-black/50 px-2 py-0.5 text-[10px] normal-case text-yellow-200 ls-fade-in">
+            scene painted for this moment
+          </span>
+        )}
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+        {/*
+          Deliberately not a <button>: a focused button would be activated by the
+          same Space/Enter press the window listener handles, advancing twice.
+          Keyboard access comes from that listener, which is always active.
+        */}
+        {phase === "story" && (
+          <div onClick={advance} className="w-full cursor-pointer select-none">
+            <p className="min-h-[4.5rem] text-lg leading-relaxed drop-shadow">
+              {currentLine.slice(0, visibleChars)}
+              {!isLineComplete && <span className="animate-pulse">▌</span>}
+            </p>
+            <span className="mt-2 inline-block text-sm text-yellow-300">
+              {isLineComplete
+                ? lineIndex < (story?.story.length ?? 0) - 1
+                  ? "Click or press Space to continue ▸"
+                  : "Click or press Space to hear their question ▸"
+                : "Click to reveal the whole line"}
+            </span>
           </div>
-        ) : step === "question" ? (
-          <div>
-            <p>{storyData.question}</p>
-            {storyData.listOfAnswer.map((answer: string, index: number) => (
-              <button
-                key={index}
-                className="block mt-2 text-blue-500 hover:text-blue-400 transition-colors"
-                onClick={() => handleAnswerClick(answer)}
-              >
-                {answer}
-              </button>
-            ))}
-            <button
-              className="mt-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-400 transition-colors"
-              onClick={() => setStep("answer")} // Transition to answer phase
-            >
-              Next
-            </button>
+        )}
+
+        {phase === "question" && story && (
+          <div className="ls-pop-in">
+            <p className="text-lg font-semibold mb-3 drop-shadow">{story.question}</p>
+            <div className="flex flex-col gap-2">
+              {story.listOfAnswer.map((answer, i) => (
+                <button
+                  key={`${i}-${answer}`}
+                  className="text-left px-4 py-2 rounded bg-black/60 hover:bg-yellow-500/80 hover:text-black border border-white/20 transition-colors"
+                  onClick={() => handleAnswerClick(answer)}
+                >
+                  {answer}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div>
-            <p>Choose your answer!</p>
-            <button
-              className="mt-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-400 transition-colors"
-              onClick={() => {
-                setStep("story"); // Reset back to story
-                setCurrentLine(0); // Optionally restart the story
-              }}
-            >
-              Start Over
-            </button>
+        )}
+
+        {phase === "grading" && (
+          <div className="flex items-center gap-3 py-6">
+            <span className="h-4 w-4 rounded-full border-2 border-yellow-300 border-t-transparent animate-spin" />
+            <p className="text-yellow-200">
+              The {npc.toLowerCase()} weighs your words…
+            </p>
           </div>
         )}
       </div>

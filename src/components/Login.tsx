@@ -1,55 +1,73 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { hasApiKey } from "../ai_handler/client";
 
 interface LoginProps {
-  setUsername: (username: string) => void;
-  setBoardSize: (size: number) => void;
+  onStart: (username: string, boardSize: number) => void;
+  winMargin: number;
 }
 
-const Login: React.FC<LoginProps> = ({ setUsername, setBoardSize }) => {
+const Login: React.FC<LoginProps> = ({ onStart, winMargin }) => {
   const [input, setInput] = useState("");
   const [boardSizeInput, setBoardSizeInput] = useState(8);
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (input.trim() && boardSizeInput >= 8 && boardSizeInput <= 32) {
-      setUsername(input);
-      setBoardSize(boardSizeInput);
-      navigate("/");
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!input.trim()) {
+      setError("Every traveller needs a name.");
+      return;
     }
+    setError("");
+    onStart(input.trim(), boardSizeInput);
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="p-4 border rounded shadow-lg bg-white">
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Literal Storyboard
-        </h1>
-        <p className="mb-4 text-justify">
-          In the mystical kingdom of Eldoria, the peace maintained by the
-          powerful Emerald Crown is shattered when the evil sorcerer Malakar
-          steals it, threatening to plunge the land into darkness. King Alden
-          calls upon four heroes—Sir Roderick, Elysia, Thrain, and Soraya—to
-          embark on a perilous quest to retrieve the crown. Their journey leads
-          them through dangerous terrains and the sinister Shadowmoor to
-          Malakar's fortress. In a climactic battle, the adventurers confront
-          Malakar, with Soraya using a powerful spell to purify the crown. Sir
-          Roderick delivers the final blow, defeating Malakar and restoring
-          peace to Eldoria.
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg p-6 border rounded-lg shadow-2xl bg-white ls-pop-in"
+      >
+        <h1 className="text-2xl font-bold mb-4 text-center">Literal Storyboard</h1>
+
+        <p className="mb-4 text-justify text-sm text-gray-700">
+          In the mystical kingdom of Eldoria, the peace maintained by the powerful
+          Emerald Crown is shattered when the sorcerer Malakar steals it. King Alden
+          calls upon four heroes — Sir Roderick, Elysia, Thrain and Soraya — to
+          retrieve it from the Shadowmoor. You ride in their wake, and every soul you
+          meet is deciding which side of the story they are on.
         </p>
-        <p>
-          AI will grade your answer and calculate sentiment score. Scores more than 3 than you enemy to Victorious.
-          Positive sentiment score is allies scores, negative sentiment score is enemies scores.
+
+        <p className="mb-4 text-sm text-gray-700">
+          Roll to travel the route. At each city an inhabitant tells you something and
+          asks a question — the AI grades the <em>tone</em> of your reply. Kind answers
+          win allies, cruel ones make enemies. Lead by {winMargin} to win; fall behind
+          by {winMargin} and Eldoria turns away.
         </p>
-        <label className="block mb-2">Username:</label>
+
+        {!hasApiKey && (
+          <p className="mb-4 rounded bg-amber-100 border border-amber-300 p-2 text-xs text-amber-900">
+            No <code>VITE_OPENROUTER_API_KEY</code> found — the game runs on bundled
+            stories and artwork. Add a key to <code>.env</code> for AI-written scenes
+            and generated backgrounds.
+          </p>
+        )}
+
+        <label className="block mb-2 font-medium" htmlFor="username">
+          Username
+        </label>
         <input
+          id="username"
           type="text"
           placeholder="Enter your username"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           className="border p-2 rounded w-full"
+          autoFocus
         />
-        <label className="block mt-4 mb-2" htmlFor="boardSize">Board Size (8-32):</label>
+
+        <label className="block mt-4 mb-2 font-medium" htmlFor="boardSize">
+          Cities on the route (8–32)
+        </label>
         <select
           id="boardSize"
           value={boardSizeInput}
@@ -62,13 +80,16 @@ const Login: React.FC<LoginProps> = ({ setUsername, setBoardSize }) => {
             </option>
           ))}
         </select>
+
+        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
         <button
-          onClick={handleLogin}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          type="submit"
+          className="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors"
         >
-          Login
+          Begin the journey
         </button>
-      </div>
+      </form>
     </div>
   );
 };
