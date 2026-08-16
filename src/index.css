@@ -1,3 +1,90 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Shared motion primitives.
+   The game moves between a map screen and a visual-novel screen constantly, so
+   every transition gets a short, consistent fade instead of a hard cut.
+--------------------------------------------------------------------------- */
+
+@keyframes ls-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ls-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ls-dice-shake {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-12deg) scale(1.08);
+  }
+  75% {
+    transform: rotate(12deg) scale(1.08);
+  }
+}
+
+@keyframes ls-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(250 204 21 / 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(250 204 21 / 0);
+  }
+}
+
+.ls-fade-in {
+  animation: ls-fade-in 0.4s ease-out both;
+}
+
+.ls-pop-in {
+  animation: ls-pop-in 0.35s ease-out both;
+}
+
+.ls-dice-rolling {
+  animation: ls-dice-shake 0.35s ease-in-out infinite;
+}
+
+.ls-token-active {
+  animation: ls-pulse-ring 1.2s ease-out infinite;
+}
+
+/* The player token slides between cities rather than teleporting. */
+.ls-token {
+  transition:
+    left 0.45s cubic-bezier(0.34, 1.2, 0.64, 1),
+    top 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-fade-in,
+  .ls-pop-in,
+  .ls-dice-rolling,
+  .ls-token-active {
+    animation: none;
+  }
+
+  .ls-token {
+    transition: none;
+  }
+}

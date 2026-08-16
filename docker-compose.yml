@@ -1,0 +1,38 @@
+# Two ways to run the game:
+#
+#   docker compose up app              production build served by nginx  -> :8080
+#   docker compose --profile dev up     vite dev server with hot reload  -> :5173
+#
+# The OpenRouter key is read from .env (copy .env.example first). Because Vite
+# inlines VITE_* variables at build time, changing the key means rebuilding the
+# production image:  docker compose build app
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        VITE_OPENROUTER_API_KEY: ${VITE_OPENROUTER_API_KEY:-}
+    image: literal-storyboard:latest
+    ports:
+      - "${PORT:-8080}:80"
+    restart: unless-stopped
+
+  dev:
+    profiles: ["dev"]
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      # Read at dev-server start, so a key change only needs a container restart.
+      VITE_OPENROUTER_API_KEY: ${VITE_OPENROUTER_API_KEY:-}
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      # Keep the container's node_modules separate from the host's — the host
+      # tree may hold darwin binaries that will not run on alpine.
+      - dev_node_modules:/app/node_modules
+
+volumes:
+  dev_node_modules:
