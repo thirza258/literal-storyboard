@@ -6,9 +6,10 @@ import MatrixBoard from "./components/MatrixBoard";
 import Character from "./components/Character";
 import Novel from "./components/Novel";
 import GameTab from "./components/GameTab";
-import Login from "./components/Login";
 import About from "./components/About";
 import Outcome from "./components/Winner";
+import LandingPage from "./components/LandingPage";
+import SEO from "./components/SEO";
 import { gradeAnswer, type SentimentVerdict } from "./ai_handler/sentiment";
 import { buildRoute, type Board } from "./game/board";
 import { randomNpc, type Npc } from "./game/npc";
@@ -53,16 +54,30 @@ function App() {
   useEffect(() => clearTimers, [clearTimers]);
 
   /**
-   * The route is laid out once, when the game starts. It used to be rebuilt on
-   * every window resize, which reshuffled the city names and positions
-   * mid-run — positions are fractions of the map now, so a resize costs nothing.
+   * The route is laid out once, when the game starts. Positions are fractions
+   * of the map, so a window resize costs nothing.
    */
   const handleStart = useCallback((name: string, size: number) => {
     setBoardSize(size);
     setBoards(buildRoute(size));
     setIndex(0);
+    setAllies(0);
+    setEnemies(0);
+    setVerdict(null);
+    setIsMoving(false);
+    setLastRoll(0);
     setUsername(name);
-  }, []);
+    navigate("/");
+  }, [navigate]);
+
+  /** Exit active run back to Landing page overview */
+  const handleExitToMenu = useCallback(() => {
+    clearTimers();
+    setUsername("");
+    setIsMoving(false);
+    setVerdict(null);
+    navigate("/");
+  }, [clearTimers, navigate]);
 
   /** Walks the token one city at a time, then opens the story where it landed. */
   const handleRoll = useCallback(
@@ -127,12 +142,24 @@ function App() {
     navigate("/");
   }, [boardSize, clearTimers, navigate]);
 
+  // If no active run has started yet, show Landing Page or About page
   if (username.trim() === "") {
-    return <Login onStart={handleStart} winMargin={WIN_MARGIN} />;
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] text-slate-100">
+        <NavBar />
+        <Routes>
+          <Route
+            path="/"
+            element={<LandingPage onStartGame={handleStart} winMargin={WIN_MARGIN} />}
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    );
   }
 
-  // Derived, not stored: the old build checked the win condition inside the roll
-  // handler against stale scores, and its navigate() raced a queued one.
+  // Active game session
   let outcome: OutcomeKind | null = null;
   if (allies >= enemies + WIN_MARGIN) outcome = "victory";
   else if (enemies >= allies + WIN_MARGIN) outcome = "defeat";
@@ -140,11 +167,16 @@ function App() {
   const currentCity = boards[index]?.name ?? "the road";
 
   return (
-    <div>
-      <NavBar username={username} allies={allies} enemies={enemies} />
-      <div className="flex mt-12">
-        <Sidebar />
-        <div className="flex-1 p-4 ml-32 overflow-auto">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-100">
+      <NavBar
+        username={username}
+        allies={allies}
+        enemies={enemies}
+        onExitGame={handleExitToMenu}
+      />
+      <div className="flex pt-14">
+        <Sidebar onExitToMenu={handleExitToMenu} />
+        <main className="flex-1 p-4 ml-36 overflow-auto min-h-[calc(100vh-3.5rem)]">
           {outcome ? (
             <Outcome
               outcome={outcome}
@@ -157,8 +189,12 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <div className="ls-fade-in">
-                    <div className="relative">
+                  <div className="ls-fade-in space-y-4 max-w-6xl mx-auto">
+                    <SEO
+                      title={`${username}'s Quest at ${currentCity} — Literal Storyboard`}
+                      description={`Currently travelling across Eldoria at ${currentCity}. Allies: ${allies}, Enemies: ${enemies}.`}
+                    />
+                    <div className="relative rounded-2xl overflow-hidden gilded-border-glow shadow-2xl">
                       <MatrixBoard boards={boards} activeIndex={index} />
                       <Character boards={boards} index={index} moving={isMoving} />
                     </div>
@@ -178,14 +214,20 @@ function App() {
               <Route
                 path="/novel"
                 element={
-                  <Novel city={currentCity} npc={npc} onAnswer={handleAnswer} />
+                  <div className="max-w-5xl mx-auto">
+                    <SEO
+                      title={`Encounter at ${currentCity} with ${npc} — Literal Storyboard`}
+                      description={`Face a narrative dilemma with ${npc} at ${currentCity} in the realm of Eldoria.`}
+                    />
+                    <Novel city={currentCity} npc={npc} onAnswer={handleAnswer} />
+                  </div>
                 }
               />
               <Route path="/about" element={<About />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

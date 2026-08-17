@@ -40,8 +40,6 @@ function GameTab({
   const handleRoll = () => {
     if (rolling || isMoving) return;
 
-    // 1–6, so a roll always moves the party. The old version rolled 0–9 and
-    // could strand you on the same city with nothing happening.
     const steps = Math.floor(Math.random() * 6) + 1;
     setRolling(true);
 
@@ -66,29 +64,31 @@ function GameTab({
   const busy = rolling || isMoving;
 
   return (
-    <div className="mt-4 p-4 rounded-lg bg-black/60 border border-yellow-700/60 text-white ls-fade-in">
+    <div className="p-5 rounded-2xl bg-slate-900/90 gilded-border-glow text-white ls-fade-in space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-sm text-yellow-300 uppercase tracking-wide">
-            Currently at {currentCity}
+          <p className="text-xs font-bold text-amber-400 uppercase tracking-wider font-cinzel">
+            📍 Current Location: {currentCity}
           </p>
-          <p className="font-bold">
-            Allies {allies} · Enemies {enemies}
-          </p>
-          <p className="text-sm text-gray-300">
+          <div className="flex items-center gap-3 text-base font-bold">
+            <span className="text-emerald-400">🤝 Allies: {allies}</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-rose-400">⚔️ Enemies: {enemies}</span>
+          </div>
+          <p className="text-xs text-slate-300">
             {margin >= 0
               ? `Win ${winMargin - margin} more ${
                   winMargin - margin === 1 ? "ally" : "allies"
-                } to claim victory.`
+                } to restore the Emerald Crown.`
               : `You are ${-margin} behind — ${
                   winMargin + margin
-                } more enemies and Eldoria falls.`}
+                } more enemies and Eldoria falls to Malakar.`}
           </p>
         </div>
 
         <div className="flex items-center gap-4">
           <div
-            className={`text-5xl leading-none select-none ${
+            className={`text-5xl leading-none select-none drop-shadow ${
               rolling ? "ls-dice-rolling" : ""
             }`}
             aria-live="polite"
@@ -97,36 +97,44 @@ function GameTab({
             {DICE_FACES[face - 1]}
           </div>
           <button
-            className="bg-red-600 hover:bg-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-6 rounded-full transition-colors"
+            className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 disabled:from-slate-700 disabled:to-slate-800 disabled:text-slate-400 disabled:cursor-not-allowed font-bold font-cinzel py-2.5 px-6 rounded-xl shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-0.5 text-sm"
             onClick={handleRoll}
             disabled={busy}
           >
-            {busy ? "Travelling…" : "ROLL"}
+            {busy ? "Travelling…" : "🎲 ROLL DICE"}
           </button>
         </div>
       </div>
 
-      {/* Score balance, drawn as a tug-of-war between allies and enemies. */}
-      <div className="mt-4 h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
-        <div
-          className="h-full bg-emerald-500 transition-all duration-500"
-          style={{ width: `${(allies / Math.max(allies + enemies, 1)) * 100}%` }}
-        />
-        <div
-          className="h-full bg-rose-600 transition-all duration-500"
-          style={{ width: `${(enemies / Math.max(allies + enemies, 1)) * 100}%` }}
-        />
+      {/* Score balance tug-of-war bar */}
+      <div className="space-y-1">
+        <div className="flex justify-between text-[11px] text-slate-400 font-mono">
+          <span>Realm Allegiance</span>
+          <span>Win Margin: ±{winMargin}</span>
+        </div>
+        <div className="h-2.5 w-full rounded-full bg-slate-950 border border-slate-800 overflow-hidden flex">
+          <div
+            className="h-full bg-emerald-500 transition-all duration-500 shadow-sm"
+            style={{ width: `${(allies / Math.max(allies + enemies, 1)) * 100}%` }}
+          />
+          <div
+            className="h-full bg-rose-600 transition-all duration-500 shadow-sm"
+            style={{ width: `${(enemies / Math.max(allies + enemies, 1)) * 100}%` }}
+          />
+        </div>
       </div>
 
       {verdict && (
-        <p
-          className={`mt-3 text-sm ls-pop-in ${
-            verdict.sentiment ? "text-emerald-300" : "text-rose-300"
+        <div
+          className={`p-3 rounded-xl border text-xs ls-pop-in flex items-center gap-2 ${
+            verdict.sentiment
+              ? "bg-emerald-950/70 border-emerald-500/50 text-emerald-200"
+              : "bg-rose-950/70 border-rose-500/50 text-rose-200"
           }`}
         >
-          {verdict.sentiment ? "🤝 " : "⚔️ "}
-          {verdict.reason}
-        </p>
+          <span className="text-base">{verdict.sentiment ? "🤝" : "⚔️"}</span>
+          <span><strong>AI Arbiter:</strong> {verdict.reason}</span>
+        </div>
       )}
     </div>
   );

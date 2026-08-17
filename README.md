@@ -38,15 +38,15 @@ Literal Storyboard is an innovative game development tool created for the AWS Ga
     npm run dev
     ```
 
-Open `http://localhost:5173` to play.
+Open `http://localhost:6061` to play.
 
 > **Note on the API key.** `VITE_*` variables are inlined into the client bundle, so the key ships to every player's browser. That is fine for a local run or a hackathon demo; put the OpenRouter calls behind a backend function before deploying anything public, and set a spend limit on the key either way — image generation costs materially more per call than text.
 
 ## Running with Docker
 
 ```bash
-docker compose up app            # production build served by nginx -> http://localhost:8080
-docker compose --profile dev up  # vite dev server with hot reload  -> http://localhost:5173
+docker compose up app            # production build served by nginx -> http://localhost:6060
+docker compose --profile dev up  # vite dev server with hot reload  -> http://localhost:6061
 ```
 
 The key is read from `.env`. Because Vite inlines `VITE_*` variables at build time, changing the key means rebuilding the production image (`docker compose build app`) — and it also means **the key is baked into any image you publish**.

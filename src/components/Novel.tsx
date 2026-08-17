@@ -111,10 +111,7 @@ const Novel: React.FC<NovelProps> = ({ city, npc, onAnswer }) => {
     }
   }, [phase, story, isLineComplete, currentLine.length, lineIndex]);
 
-  // Keyboard only, and only while prose is on screen — the old build listened
-  // for clicks on `window` as well, which fired alongside the button's own
-  // handler and skipped two lines at a time. Scoping to the story phase also
-  // keeps Enter free for keyboard users choosing an answer.
+  // Keyboard controls
   useEffect(() => {
     if (phase !== "story") return;
 
@@ -135,21 +132,24 @@ const Novel: React.FC<NovelProps> = ({ city, npc, onAnswer }) => {
 
   if (phase === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] text-white">
-        <div className="mb-4 text-lg">Riding into {city}…</div>
-        <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
-          <div className="h-full w-1/3 bg-yellow-400 animate-pulse rounded-full" />
+      <div className="flex flex-col items-center justify-center h-[75vh] text-white space-y-4">
+        <div className="text-xl font-cinzel text-amber-300">Riding into {city}…</div>
+        <div className="w-64 h-2.5 bg-slate-900 rounded-full overflow-hidden border border-amber-500/30">
+          <div className="h-full w-1/3 bg-gradient-to-r from-amber-400 to-yellow-400 animate-pulse rounded-full" />
         </div>
+        <p className="text-xs text-slate-400">AI Storyteller Agent is weaving the encounter…</p>
       </div>
     );
   }
 
   return (
-    <div className="relative h-[80vh] rounded-lg overflow-hidden border-2 border-yellow-700/60 ls-fade-in">
+    <div className="relative h-[80vh] rounded-2xl overflow-hidden gilded-border-glow shadow-2xl ls-fade-in">
+      {/* Bundled Scene Backdrop */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${bundledArt})` }}
       />
+      {/* Generated AI Backdrop */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
         style={{
@@ -157,52 +157,60 @@ const Novel: React.FC<NovelProps> = ({ city, npc, onAnswer }) => {
           opacity: generatedArt ? 1 : 0,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
-      <div className="absolute top-3 left-4 flex items-center gap-2 text-xs uppercase tracking-widest text-yellow-300/90">
-        <span>
-          {city} · {npc}
+      {/* City & NPC Tag Header */}
+      <div className="absolute top-4 left-5 flex items-center gap-2 text-xs uppercase tracking-widest text-amber-300">
+        <span className="bg-black/70 px-3 py-1 rounded-lg border border-amber-500/30 font-bold font-cinzel">
+          📍 {city} · {npc}
         </span>
         {generatedArt && (
-          <span className="rounded bg-black/50 px-2 py-0.5 text-[10px] normal-case text-yellow-200 ls-fade-in">
-            scene painted for this moment
+          <span className="rounded bg-black/70 px-2.5 py-1 text-[11px] normal-case text-emerald-300 border border-emerald-500/30 ls-fade-in">
+            ✨ Scene painted by AI Agent
           </span>
         )}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-        {/*
-          Deliberately not a <button>: a focused button would be activated by the
-          same Space/Enter press the window listener handles, advancing twice.
-          Keyboard access comes from that listener, which is always active.
-        */}
+      {/* Story Text Box & Dialogue */}
+      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 text-white bg-slate-950/80 backdrop-blur-md border-t border-amber-500/30">
         {phase === "story" && (
-          <div onClick={advance} className="w-full cursor-pointer select-none">
-            <p className="min-h-[4.5rem] text-lg leading-relaxed drop-shadow">
+          <div onClick={advance} className="w-full cursor-pointer select-none space-y-2">
+            <p className="min-h-[4rem] text-base sm:text-lg leading-relaxed drop-shadow font-medium text-slate-100">
               {currentLine.slice(0, visibleChars)}
-              {!isLineComplete && <span className="animate-pulse">▌</span>}
+              {!isLineComplete && <span className="text-amber-400 animate-pulse">▌</span>}
             </p>
-            <span className="mt-2 inline-block text-sm text-yellow-300">
+            <span className="inline-block text-xs font-semibold text-amber-400 font-cinzel">
               {isLineComplete
                 ? lineIndex < (story?.story.length ?? 0) - 1
                   ? "Click or press Space to continue ▸"
-                  : "Click or press Space to hear their question ▸"
-                : "Click to reveal the whole line"}
+                  : "Click or press Space to hear their dilemma ▸"
+                : "Click to reveal line"}
             </span>
           </div>
         )}
 
         {phase === "question" && story && (
-          <div className="ls-pop-in">
-            <p className="text-lg font-semibold mb-3 drop-shadow">{story.question}</p>
-            <div className="flex flex-col gap-2">
+          <div className="ls-pop-in space-y-4">
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider font-cinzel">
+                🗣️ {npc} asks:
+              </span>
+              <p className="text-base sm:text-lg font-bold text-white drop-shadow font-cinzel">
+                "{story.question}"
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2.5">
               {story.listOfAnswer.map((answer, i) => (
                 <button
                   key={`${i}-${answer}`}
-                  className="text-left px-4 py-2 rounded bg-black/60 hover:bg-yellow-500/80 hover:text-black border border-white/20 transition-colors"
+                  className="text-left px-4 py-3 rounded-xl bg-slate-900/90 hover:bg-amber-500/20 hover:border-yellow-400 hover:text-amber-200 border border-slate-700 transition-all duration-200 text-sm font-medium flex items-start gap-3 shadow-md"
                   onClick={() => handleAnswerClick(answer)}
                 >
-                  {answer}
+                  <span className="text-xs mt-0.5 px-2 py-0.5 rounded bg-black/60 text-amber-400 border border-amber-500/30 font-mono">
+                    {i + 1}
+                  </span>
+                  <span className="flex-1">{answer}</span>
                 </button>
               ))}
             </div>
@@ -210,10 +218,10 @@ const Novel: React.FC<NovelProps> = ({ city, npc, onAnswer }) => {
         )}
 
         {phase === "grading" && (
-          <div className="flex items-center gap-3 py-6">
-            <span className="h-4 w-4 rounded-full border-2 border-yellow-300 border-t-transparent animate-spin" />
-            <p className="text-yellow-200">
-              The {npc.toLowerCase()} weighs your words…
+          <div className="flex items-center gap-3 py-4">
+            <span className="h-5 w-5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+            <p className="text-amber-300 font-cinzel font-semibold text-sm">
+              The {npc.toLowerCase()} weighs the tone and morality of your words…
             </p>
           </div>
         )}

@@ -111,7 +111,7 @@ do_docker() {
     docker push "$remote"
     info "Pushed $remote"
   else
-    info "Run it with: docker run --rm -p 8080:80 $ref"
+    info "Run it with: docker run --rm -p 6060:80 $ref"
   fi
 }
 

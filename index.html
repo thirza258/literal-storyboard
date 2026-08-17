@@ -1,12 +1,89 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./src/assets/map.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Literal Storyboard</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>Literal Storyboard — AI Fantasy Game Agent & Interactive Storytelling RPG</title>
+    <meta name="title" content="Literal Storyboard — AI Fantasy Game Agent & Interactive Storytelling RPG" />
+    <meta name="description" content="Embark on an epic quest in the kingdom of Eldoria with Literal Storyboard. Powered by Gemini 3.7 Flash AI agents and OpenRouter, featuring dynamic scene generation, procedural fantasy cartography, and real-time sentiment diplomacy mechanics." />
+    <meta name="keywords" content="AI game agent, AI RPG, interactive storytelling, procedural fantasy map, OpenRouter, Gemini 3.7 Flash, sentiment analysis game, AWS Game Builder Hackathon, visual novel AI, Eldoria fantasy game, dynamic game agent" />
+    <meta name="author" content="Literal Storyboard Team" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <link rel="canonical" href="https://literal-storyboard.vercel.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://literal-storyboard.vercel.app/" />
+    <meta property="og:site_name" content="Literal Storyboard" />
+    <meta property="og:title" content="Literal Storyboard — AI Fantasy Game Agent & Interactive Storytelling RPG" />
+    <meta property="og:description" content="Experience autonomous AI storytelling in Eldoria. Dynamic Gemini-powered game agents generate story beats, paint living scene backgrounds, and judge player morality via tone sentiment mechanics." />
+    <meta property="og:image" content="./src/assets/background.png" />
+    <meta property="og:image:alt" content="Literal Storyboard Fantasy Adventure Realm" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://literal-storyboard.vercel.app/" />
+    <meta name="twitter:title" content="Literal Storyboard — Dynamic AI Game Agent" />
+    <meta name="twitter:description" content="Play the AI fantasy adventure game where every city beat is generated live by Gemini 3.7 Flash, painted dynamically, and your words decide allies vs enemies." />
+    <meta name="twitter:image" content="./src/assets/background.png" />
+
+    <!-- Google Fonts Preconnect & Stylesheet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700;800;900&family=MedievalSharp&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+
+    <!-- JSON-LD Structured Data for Game / Web Application -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://literal-storyboard.vercel.app/#website",
+            "url": "https://literal-storyboard.vercel.app/",
+            "name": "Literal Storyboard",
+            "description": "Dynamic AI Game Agent & Interactive Fantasy RPG",
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "VideoGame",
+            "@id": "https://literal-storyboard.vercel.app/#game",
+            "name": "Literal Storyboard",
+            "url": "https://literal-storyboard.vercel.app/",
+            "description": "An innovative AI game agent RPG combining OpenRouter, Gemini 3.7 Flash storytelling, real-time sentiment analysis, and procedural fantasy map generation for the AWS Game Builder Hackathon.",
+            "genre": ["Role-Playing Game", "Interactive Fiction", "AI Game Agent", "Visual Novel", "Procedural Adventure"],
+            "gamePlatform": ["Web Browser", "Desktop", "Mobile"],
+            "applicationCategory": "Game",
+            "operatingSystem": "Any modern web browser with JavaScript enabled",
+            "author": {
+              "@type": "Organization",
+              "name": "Literal Storyboard Team"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "0.00",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            },
+            "featureList": [
+              "Autonomous Gemini 3.7 Flash Storytelling Agent",
+              "Dynamic Nano Banana Scene Background Painter",
+              "Real-time Sentiment Diplomacy Mechanics (Allies vs Enemies)",
+              "Procedural Snake-and-Ladder Fantasy Map Generator",
+              "Offline Mode with Bundled High-Fantasy Artwork",
+              "OpenRouter Pluggable AI Model Architecture"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
-  <body style="background: url('./src/assets/background.png') no-repeat center center fixed; background-size: cover;">
+  <body class="antialiased bg-[#0a0a0f] text-slate-100 selection:bg-yellow-500 selection:text-black">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

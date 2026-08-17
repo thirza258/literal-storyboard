@@ -1,0 +1,17 @@
+{
+  "short_name": "Literal Storyboard",
+  "name": "Literal Storyboard — AI Fantasy Game Agent & Interactive Storytelling RPG",
+  "description": "An innovative AI-powered fantasy RPG storytelling agent created for the AWS Game Builder Hackathon, integrating OpenRouter, Gemini AI models, and Fantasy Map Generator.",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0a0a0f",
+  "theme_color": "#eab308",
+  "display": "standalone",
+  "orientation": "any"
+}
