@@ -17,7 +17,7 @@ export default function SEO({
   description = DEFAULT_DESC,
   keywords,
   ogImage = "./src/assets/background.png",
-  canonicalUrl = "https://literal-storyboard.vercel.app/",
+  canonicalUrl = "https://story.nevatal.id/",
 }: SEOProps) {
   useEffect(() => {
     // Document title
