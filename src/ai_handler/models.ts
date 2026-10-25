@@ -15,6 +15,32 @@
 export const TEXT_MODEL = "google/gemini-3.7-flash";
 
 /**
+ * Free models available on OpenRouter when credits are exhausted.
+ */
+export const DEFAULT_FREE_MODELS: string[] = [
+  "openrouter/free",
+  "google/gemma-4-26b-a4b-it:free",
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3.5-lightning:free",
+  "nvidia/nemotron-3.5-super-vl:free",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "cohere/north-mini-code:free",
+  "liquid/lfm-2.5-2.6b:free",
+  "recursive/flint-v1.0:free",
+  "dots-studio/dots-3-note-preview:free",
+];
+
+export function getShuffledFreeModels(excludeModel?: string): string[] {
+  const models = DEFAULT_FREE_MODELS.filter((m) => m !== excludeModel);
+  for (let i = models.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [models[i], models[j]] = [models[j], models[i]];
+  }
+  return models;
+}
+
+/**
  * Scene backgrounds. The cheapest, fastest image model in the Nano Banana
  * family, which matters because a scene is generated on every story beat.
  */

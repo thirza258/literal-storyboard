@@ -1,3 +1,5 @@
+import { getShuffledFreeModels } from "./models";
+
 const BASE_URL = "https://openrouter.ai/api/v1";
 
 const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
@@ -45,7 +47,9 @@ async function post<T>(path: string, body: unknown, signal?: AbortSignal): Promi
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
-    throw new Error(`OpenRouter ${response.status}: ${detail.slice(0, 300)}`);
+    const error = new Error(`OpenRouter ${response.status}: ${detail.slice(0, 300)}`);
+    Object.assign(error, { status: response.status, detail });
+    throw error;
   }
 
   return (await response.json()) as T;
@@ -81,6 +85,26 @@ export interface ChatJsonRequest {
   signal?: AbortSignal;
 }
 
+function isCreditError(error: unknown): boolean {
+  if (!error) return false;
+  const status = (error as { status?: number })?.status;
+  if (status === 402) return true;
+  const msg = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  const detail = String((error as { detail?: string })?.detail || "").toLowerCase();
+  const text = `${msg} ${detail}`;
+  return (
+    text.includes("402") ||
+    text.includes("insufficient credit") ||
+    text.includes("payment required") ||
+    text.includes("credit limit") ||
+    text.includes("credits is over") ||
+    text.includes("credits are over") ||
+    text.includes("out of credits") ||
+    text.includes("balance is too low") ||
+    text.includes("quota")
+  );
+}
+
 /**
  * One chat completion constrained to a JSON schema. Returns the decoded body as
  * `unknown` — callers validate it, because `strict` enforcement varies by
@@ -96,23 +120,60 @@ export async function chatJson({
   maxTokens,
   signal,
 }: ChatJsonRequest): Promise<unknown> {
-  const completion = await post<ChatCompletion>(
-    "/chat/completions",
-    {
-      model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature,
-      max_tokens: maxTokens,
-      response_format: {
-        type: "json_schema",
-        json_schema: { name: schemaName, strict: true, schema },
-      },
+  const makeBody = (targetModel: string) => ({
+    model: targetModel,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    temperature,
+    max_tokens: maxTokens,
+    response_format: {
+      type: "json_schema",
+      json_schema: { name: schemaName, strict: true, schema },
     },
-    signal
-  );
+  });
+
+  let completion: ChatCompletion;
+  try {
+    completion = await post<ChatCompletion>(
+      "/chat/completions",
+      makeBody(model),
+      signal
+    );
+  } catch (err) {
+    if (!isCreditError(err)) {
+      throw err;
+    }
+    console.warn(
+      `OpenRouter credits exhausted for ${model}. Falling back to shuffled free models...`
+    );
+    const fallbackModels = getShuffledFreeModels(model);
+    let lastError = err;
+    let success = false;
+    completion = {} as ChatCompletion;
+
+    for (const freeModel of fallbackModels) {
+      try {
+        console.info(`Attempting fallback to free model: ${freeModel}`);
+        completion = await post<ChatCompletion>(
+          "/chat/completions",
+          makeBody(freeModel),
+          signal
+        );
+        console.info(`Fallback succeeded with free model: ${freeModel}`);
+        success = true;
+        break;
+      } catch (fbErr) {
+        if (signal?.aborted) throw fbErr;
+        console.warn(`Fallback to free model ${freeModel} failed:`, fbErr);
+        lastError = fbErr;
+      }
+    }
+    if (!success) {
+      throw lastError;
+    }
+  }
 
   const choice = completion.choices?.[0];
   if (choice?.finish_reason === "length") {
