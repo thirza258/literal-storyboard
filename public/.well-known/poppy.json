@@ -1,0 +1,46 @@
+{
+  "protocol_version": "0.1",
+  "organization": {
+    "name": "Nevatal",
+    "domain": "story.nevatal.id"
+  },
+  "auth": {
+    "issuer": "https://story.nevatal.id",
+    "direct": {
+      "scopes": [
+        "poppy:read",
+        "poppy:write"
+      ]
+    },
+    "device": {
+      "scopes": [
+        "poppy:read",
+        "poppy:write"
+      ]
+    }
+  },
+  "agent": {
+    "protocols": [
+      {
+        "type": "poppy",
+        "endpoint": "https://story.nevatal.id/api/"
+      }
+    ]
+  },
+  "apis": [
+    {
+      "type": "openapi",
+      "url": "https://story.nevatal.id/",
+      "description": "Literal Storyboard API"
+    },
+    {
+      "type": "mcp",
+      "url": "https://story.nevatal.id/mcp",
+      "description": "Literal Storyboard MCP server"
+    }
+  ],
+  "web": {
+    "browser_session_endpoint": "https://story.nevatal.id/"
+  },
+  "extensions": {}
+}

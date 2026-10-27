@@ -1,0 +1,50 @@
+{
+  "name": "Literal Storyboard Agent",
+  "description": "AI storytelling board game where each choice shapes allies, enemies and the story across a fantasy map.",
+  "url": "https://story.nevatal.id",
+  "provider": {
+    "name": "Nevatal",
+    "url": "https://story.nevatal.id"
+  },
+  "version": "1.0.0",
+  "protocolVersion": "0.3.0",
+  "preferredTransport": "JSONRPC",
+  "supportedInterfaces": [
+    {
+      "url": "https://story.nevatal.id/api",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "0.3.0"
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "start-story-game",
+      "name": "Start Story Game",
+      "description": "Start a new AI-narrated storyboard adventure."
+    },
+    {
+      "id": "choose-story-reply",
+      "name": "Choose Story Reply",
+      "description": "Choose a reply and have its tone graded by the story engine."
+    },
+    {
+      "id": "explore-fantasy-map",
+      "name": "Explore Fantasy Map",
+      "description": "Move across the generated fantasy map and visit cities."
+    }
+  ],
+  "authentication": {
+    "type": "oauth2",
+    "discovery_url": "https://story.nevatal.id/.well-known/oauth-authorization-server"
+  }
+}

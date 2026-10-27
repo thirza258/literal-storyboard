@@ -1,0 +1,11 @@
+# Literal Storyboard
+
+> AI storytelling board game where each choice shapes allies, enemies and the story across a fantasy map.
+
+## Endpoints
+- Homepage: https://story.nevatal.id/
+- API: https://story.nevatal.id/
+- API Catalog: https://story.nevatal.id/.well-known/api-catalog
+- Agent Card: https://story.nevatal.id/.well-known/agent-card.json
+- AI Catalog: https://story.nevatal.id/.well-known/ai-catalog.json
+- Authentication Guide: https://story.nevatal.id/auth.md

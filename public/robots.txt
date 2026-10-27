@@ -3,3 +3,4 @@ Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 
 Sitemap: https://story.nevatal.id/sitemap.xml
+Agentmap: https://story.nevatal.id/.well-known/ai-catalog.json

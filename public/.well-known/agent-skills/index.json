@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "start-story-game",
+      "type": "skill-md",
+      "description": "Start a new AI-narrated storyboard adventure.",
+      "url": "https://story.nevatal.id/.well-known/agent-skills/start-story-game/SKILL.md"
+    },
+    {
+      "name": "choose-story-reply",
+      "type": "skill-md",
+      "description": "Choose a reply and have its tone graded by the story engine.",
+      "url": "https://story.nevatal.id/.well-known/agent-skills/choose-story-reply/SKILL.md"
+    },
+    {
+      "name": "explore-fantasy-map",
+      "type": "skill-md",
+      "description": "Move across the generated fantasy map and visit cities.",
+      "url": "https://story.nevatal.id/.well-known/agent-skills/explore-fantasy-map/SKILL.md"
+    }
+  ]
+}

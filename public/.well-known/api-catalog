@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://story.nevatal.id/api",
+      "service-desc": [
+        {
+          "href": "https://story.nevatal.id/",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://story.nevatal.id/auth.md",
+          "type": "text/markdown"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://story.nevatal.id/",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

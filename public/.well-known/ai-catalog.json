@@ -1,0 +1,28 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Literal Storyboard",
+    "identifier": "did:web:story.nevatal.id"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:story.nevatal.id:api:site",
+      "displayName": "Literal Storyboard API",
+      "type": "application/json",
+      "url": "https://story.nevatal.id/",
+      "representativeQueries": [
+        "what does Literal Storyboard do",
+        "get data from Literal Storyboard"
+      ]
+    },
+    {
+      "identifier": "urn:air:story.nevatal.id:server:mcp",
+      "displayName": "Literal Storyboard MCP Server",
+      "type": "application/mcp-server-card+json",
+      "url": "https://story.nevatal.id/.well-known/mcp/server-card.json",
+      "representativeQueries": [
+        "query Literal Storyboard"
+      ]
+    }
+  ]
+}
