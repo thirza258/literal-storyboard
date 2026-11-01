@@ -1069,7 +1069,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, winMargin }) => 
             <p>
               © {new Date().getFullYear()} Literal Storyboard Team. Distributed under MIT License. ·{" "}
               <a href="/privacy" className="hover:text-amber-300 transition-colors underline">Privacy Policy</a> ·{" "}
-              <a href="/terms" className="hover:text-amber-300 transition-colors underline">Terms of Service</a>
+              <a href="/terms" className="hover:text-amber-300 transition-colors underline">Terms of Service</a> ·{" "}
+              This project is under <a href="https://nevatal.id" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors underline">nevatal.id</a> for educational purposes.
             </p>
             <p className="flex items-center gap-4">
               <span>Kingdom of Eldoria</span>
