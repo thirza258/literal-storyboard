@@ -1066,7 +1066,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartGame, winMargin }) => 
           </div>
 
           <div className="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <p>© {new Date().getFullYear()} Literal Storyboard Team. Distributed under MIT License.</p>
+            <p>
+              © {new Date().getFullYear()} Literal Storyboard Team. Distributed under MIT License. ·{" "}
+              <a href="/privacy" className="hover:text-amber-300 transition-colors underline">Privacy Policy</a> ·{" "}
+              <a href="/terms" className="hover:text-amber-300 transition-colors underline">Terms of Service</a>
+            </p>
             <p className="flex items-center gap-4">
               <span>Kingdom of Eldoria</span>
               <span>•</span>

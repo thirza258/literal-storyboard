@@ -1,3 +1,4 @@
+import LegalPage from "./components/LegalPage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import NavBar from "./components/NavBar";
@@ -153,6 +154,8 @@ function App() {
             element={<LandingPage onStartGame={handleStart} winMargin={WIN_MARGIN} />}
           />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<LegalPage initialTab="privacy" />} />
+          <Route path="/terms" element={<LegalPage initialTab="terms" />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
@@ -224,6 +227,8 @@ function App() {
                 }
               />
               <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<LegalPage initialTab="privacy" />} />
+              <Route path="/terms" element={<LegalPage initialTab="terms" />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           )}
