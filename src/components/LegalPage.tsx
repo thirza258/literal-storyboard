@@ -115,6 +115,19 @@ const LegalPage: React.FC<LegalPageProps> = ({ initialTab = "privacy" }) => {
                   The game uses temporary browser state to maintain active campaign positions across Eldoria. Clearing your browser cache or restarting the game resets all progress locally.
                 </p>
               </section>
+
+              <section className="space-y-3">
+                <h2 className="text-lg font-cinzel font-bold text-amber-300 border-b border-slate-800 pb-2">
+                  4. Privacy Inquiries &amp; Contact
+                </h2>
+                <p>
+                  For inquiries regarding your data or this self-hosted deployment, reach out to{" "}
+                  <a href="mailto:nevatalapp@gmail.com" className="text-amber-400 hover:underline font-semibold">
+                    nevatalapp@gmail.com
+                  </a>
+                  .
+                </p>
+              </section>
             </>
           ) : (
             <>
@@ -160,6 +173,19 @@ const LegalPage: React.FC<LegalPageProps> = ({ initialTab = "privacy" }) => {
                 </h2>
                 <p>
                   The service is provided "AS IS" under the MIT License without warranties of any kind. The creators and server operators assume no responsibility for uninterrupted service or story outcome persistence.
+                </p>
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-lg font-cinzel font-bold text-amber-300 border-b border-slate-800 pb-2">
+                  5. Contact &amp; Legal Notices
+                </h2>
+                <p>
+                  For questions regarding these terms of service, contact{" "}
+                  <a href="mailto:nevatalapp@gmail.com" className="text-amber-400 hover:underline font-semibold">
+                    nevatalapp@gmail.com
+                  </a>
+                  .
                 </p>
               </section>
             </>
